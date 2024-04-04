@@ -1,0 +1,130 @@
+[gd_scene load_steps=7 format=3 uid="uid://crgryhbsx5ap5"]
+
+[ext_resource type="PackedScene" uid="uid://bbwf28135171q" path="res://game_button.tscn" id="1_gjr3p"]
+
+[sub_resource type="GDScript" id="GDScript_mu0o0"]
+resource_name = "ui"
+script/source = "extends Control
+
+@export var button_container: Container
+@export var button: PackedScene
+@export var title: Label
+@export var description: Label
+@export var play: Button
+var selected_id: String
+
+func _ready():
+	play.pressed.connect(_on_play)
+	for game in Games.games.keys():
+		var b = button.instantiate()
+		b.title = title
+		b.description = description
+		b.game_id = game
+		b.ui = self
+		button_container.add_child(b)
+
+func _on_play():
+	OS.execute(selected_id, [])
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfpoe"]
+bg_color = Color(0.25, 0.25, 0.25, 1)
+border_width_left = 8
+border_width_right = 8
+border_color = Color(0.25, 0.25, 0.25, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a5n5d"]
+bg_color = Color(0.25, 0.25, 0.25, 1)
+border_width_left = 16
+border_width_top = 16
+border_width_right = 16
+border_width_bottom = 16
+border_color = Color(0.25, 0.25, 0.25, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_lovmn"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_2k718"]
+
+[node name="UI" type="Control" node_paths=PackedStringArray("button_container", "title", "description", "play")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = SubResource("GDScript_mu0o0")
+button_container = NodePath("HBoxContainer/ScrollContainer/Games/VBoxContainer")
+button = ExtResource("1_gjr3p")
+title = NodePath("HBoxContainer/Descriptions/VBoxContainer/Title")
+description = NodePath("HBoxContainer/Descriptions/VBoxContainer/ScrollContainer/Description")
+play = NodePath("HBoxContainer/Descriptions/VBoxContainer/Play")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.12, 0.12, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Games" type="PanelContainer" parent="HBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_sfpoe")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/ScrollContainer/Games"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="Descriptions" type="PanelContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_a5n5d")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Descriptions"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="HBoxContainer/Descriptions/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Game Name"
+label_settings = SubResource("LabelSettings_lovmn")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Descriptions/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Description" type="Label" parent="HBoxContainer/Descriptions/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Description."
+label_settings = SubResource("LabelSettings_2k718")
+autowrap_mode = 3
+
+[node name="Play" type="Button" parent="HBoxContainer/Descriptions/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Play"

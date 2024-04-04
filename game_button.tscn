@@ -1,0 +1,59 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbwf28135171q"]
+
+[ext_resource type="Texture2D" uid="uid://ct63hu6i56ah0" path="res://icon.svg" id="1_37p5l"]
+
+[sub_resource type="GDScript" id="GDScript_piioo"]
+resource_name = "game_button"
+script/source = "extends TextureButton
+
+@export var focused: bool = false
+var title: Label
+var description: Label
+var game_id: String
+var ui
+
+func _ready():
+	$ColorRect.hide()
+	focus_entered.connect(_on_focus_entered)
+	focus_exited.connect(_on_focus_exited)
+	if focused: grab_focus()
+
+func _on_focus_entered():
+	$ColorRect.show()
+	ui.selected_id = game_id
+	var g = Games.games[game_id]
+	title.text = g[\"title\"]
+	description.text = g[\"description\"]
+
+func _on_focus_exited():
+	$ColorRect.hide()
+"
+
+[node name="GameButton" type="TextureButton"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("1_37p5l")
+texture_pressed = ExtResource("1_37p5l")
+texture_hover = ExtResource("1_37p5l")
+script = SubResource("GDScript_piioo")
+focused = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.25098)
