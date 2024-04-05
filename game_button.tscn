@@ -8,25 +8,32 @@ script/source = "extends TextureButton
 
 @export var focused: bool = false
 var title: Label
-var description: Label
-var game_id: String
+var description: RichTextLabel
+var play_button: Button
+var game_id: int
 var ui
 
 func _ready():
 	$ColorRect.hide()
 	focus_entered.connect(_on_focus_entered)
-	focus_exited.connect(_on_focus_exited)
 	if focused: grab_focus()
 
 func _on_focus_entered():
 	$ColorRect.show()
+	get_parent_control().get_child(ui.selected_id)._on_focus_exited()
 	ui.selected_id = game_id
-	var g = Games.games[game_id]
-	title.text = g[\"title\"]
-	description.text = g[\"description\"]
+	var g: Dictionary = Games.games[game_id]
+	var t = g[\"title\"] if g.has(\"title\") else \"Missing Title\"
+	var d: String = g[\"description\"] if g.has(\"description\") else \"Missing description.\"
+	if not g.has(&\"exe_path\"):
+		play_button.disabled = true
+		d = d.insert(0, \"[color=RED]MISSING EXE[/color]\\n\")
+	title.text = t
+	description.text = d
 
 func _on_focus_exited():
 	$ColorRect.hide()
+	play_button.disabled = false
 "
 
 [node name="GameButton" type="TextureButton"]

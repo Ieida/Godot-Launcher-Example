@@ -9,22 +9,23 @@ script/source = "extends Control
 @export var button_container: Container
 @export var button: PackedScene
 @export var title: Label
-@export var description: Label
+@export var description: RichTextLabel
 @export var play: Button
-var selected_id: String
+var selected_id: int
 
 func _ready():
 	play.pressed.connect(_on_play)
-	for game in Games.games.keys():
+	for game in Games.games:
 		var b = button.instantiate()
 		b.title = title
 		b.description = description
-		b.game_id = game
+		b.game_id = Games.games.find(game)
 		b.ui = self
+		b.play_button = play
 		button_container.add_child(b)
 
 func _on_play():
-	OS.execute(selected_id, [])
+	OS.execute(Games.games[selected_id][&\"exe_path\"], [])
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfpoe"]
@@ -44,7 +45,16 @@ border_color = Color(0.25, 0.25, 0.25, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_lovmn"]
 font_size = 32
 
-[sub_resource type="LabelSettings" id="LabelSettings_2k718"]
+[sub_resource type="GDScript" id="GDScript_jpi0x"]
+resource_name = "description"
+script/source = "extends RichTextLabel
+
+func _ready():
+	meta_clicked.connect(_on_meta_clicked)
+
+func _on_meta_clicked(meta: Variant):
+	OS.shell_open(str(meta))
+"
 
 [node name="UI" type="Control" node_paths=PackedStringArray("button_container", "title", "description", "play")]
 layout_mode = 3
@@ -115,16 +125,18 @@ label_settings = SubResource("LabelSettings_lovmn")
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Description" type="Label" parent="HBoxContainer/Descriptions/VBoxContainer/ScrollContainer"]
+[node name="Description" type="RichTextLabel" parent="HBoxContainer/Descriptions/VBoxContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "Description."
-label_settings = SubResource("LabelSettings_2k718")
-autowrap_mode = 3
+bbcode_enabled = true
+text = "[color=AQUA]Description[/color].[p]New paragraph.[/p]
+[font_size=512]OMG[/font_size]"
+fit_content = true
+script = SubResource("GDScript_jpi0x")
 
 [node name="Play" type="Button" parent="HBoxContainer/Descriptions/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 32
 text = "Play"
